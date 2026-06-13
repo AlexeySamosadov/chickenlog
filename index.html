@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChickenLog — Backyard Chicken Flock &amp; Egg Log</title>
+<meta name="description" content="A private, offline egg log and flock tracker for backyard chicken keepers. Log daily egg counts, track birds, record mite/worming and health treatments — all on your device, no account.">
+<meta name="theme-color" content="#b45309">
+<link rel="canonical" href="https://alexeysamosadov.github.io/chickenlog/">
+<meta property="og:title" content="ChickenLog — Backyard Chicken Flock &amp; Egg Log">
+<meta property="og:description" content="Log daily eggs, track your flock, and keep health records. Private, offline, no account.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://alexeysamosadov.github.io/chickenlog/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%94%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#fff7ed; --panel:#ffffff; --ink:#43302b; --muted:#92837a;
+    --line:#f0e0d0; --amber:#b45309; --amber2:#d97706; --amber-soft:#fef3c7;
+    --green:#15803d; --green-soft:#dcfce7; --red:#b91c1c; --red-soft:#fee2e2;
+    --shadow:0 1px 3px rgba(120,80,40,.08),0 6px 18px rgba(120,80,40,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;
+    -webkit-text-size-adjust:100%;padding-bottom:84px;
+  }
+  header.app{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,#fffaf2,#fff7ed);
+    border-bottom:1px solid var(--line);
+    padding:14px 16px;display:flex;align-items:center;gap:10px;
+  }
+  header.app .logo{font-size:26px;line-height:1}
+  header.app h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.3px}
+  header.app .sub{font-size:12px;color:var(--muted);margin-top:1px}
+  header.app .spacer{flex:1}
+  .pro-pill{
+    font-size:12px;font-weight:700;border-radius:999px;padding:6px 12px;
+    border:1px solid var(--amber);color:var(--amber);background:#fff;cursor:pointer;
+  }
+  .pro-pill.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  main{max-width:760px;margin:0 auto;padding:16px}
+  section{margin-bottom:20px}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 10px;font-weight:700}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;box-shadow:var(--shadow);
+  }
+  .card .big{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+  .card .lbl{font-size:12px;color:var(--muted);margin-top:2px}
+  .card.accent{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a}
+  .card.accent .big{color:var(--amber)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--shadow);
+  }
+  label{display:block;font-size:13px;font-weight:600;margin:0 0 5px;color:var(--ink)}
+  input,select,textarea{
+    width:100%;font:inherit;color:var(--ink);background:#fffdf9;
+    border:1px solid #e6d6c4;border-radius:12px;padding:11px 12px;
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--amber2);outline-offset:1px;border-color:var(--amber2)}
+  textarea{resize:vertical;min-height:60px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > *{flex:1;min-width:120px}
+  .btn{
+    font:inherit;font-weight:700;cursor:pointer;border:none;border-radius:12px;
+    padding:11px 16px;background:var(--amber);color:#fff;
+  }
+  .btn:hover{background:var(--amber2)}
+  .btn.sec{background:#fff;color:var(--amber);border:1px solid var(--amber)}
+  .btn.sec:hover{background:var(--amber-soft)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn.sm{padding:7px 11px;font-size:13px}
+  .btn.pro{position:relative}
+  .btn.pro::after{content:"PRO";font-size:9px;font-weight:800;background:var(--amber);color:#fff;border-radius:5px;padding:1px 4px;margin-left:6px;vertical-align:middle}
+  .btn.sec.pro::after{background:var(--amber)}
+  .mt{margin-top:12px}
+  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .quick button{
+    border:1px solid #e6d6c4;background:#fffdf9;border-radius:10px;padding:8px 12px;
+    font-weight:700;cursor:pointer;color:var(--ink)
+  }
+  .quick button:hover{background:var(--amber-soft);border-color:var(--amber2)}
+  ul.list{list-style:none;margin:10px 0 0;padding:0}
+  ul.list li{
+    display:flex;align-items:center;gap:10px;padding:11px 4px;border-top:1px solid var(--line)
+  }
+  ul.list li:first-child{border-top:none}
+  .li-main{flex:1;min-width:0}
+  .li-title{font-weight:700}
+  .li-sub{font-size:12px;color:var(--muted)}
+  .tag{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .tag.active{background:var(--green-soft);color:var(--green)}
+  .tag.lost{background:var(--red-soft);color:var(--red)}
+  .tag.t{background:var(--amber-soft);color:var(--amber)}
+  .x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px 8px;line-height:1}
+  .x:hover{color:var(--red)}
+  .empty{color:var(--muted);font-size:14px;padding:14px 4px;text-align:center}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:8px}
+  .bars .b{flex:1;background:var(--amber-soft);border-radius:6px 6px 0 0;position:relative;min-height:3px;display:flex;justify-content:center}
+  .bars .b > span{position:absolute;bottom:100%;font-size:11px;color:var(--muted);padding-bottom:2px;font-weight:700}
+  .bars .b > em{position:absolute;top:100%;font-size:10px;color:var(--muted);padding-top:3px;font-style:normal}
+  .bars .b.hi{background:linear-gradient(180deg,var(--amber2),var(--amber))}
+  nav.tabs{
+    position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;
+    background:#fffaf2;border-top:1px solid var(--line);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+  }
+  nav.tabs button{
+    flex:1;border:none;background:none;cursor:pointer;padding:8px 2px;border-radius:12px;
+    color:var(--muted);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px
+  }
+  nav.tabs button .ic{font-size:20px}
+  nav.tabs button.on{color:var(--amber);background:var(--amber-soft)}
+  .view{display:none}
+  .view.on{display:block;animation:fade .18s ease}
+  @keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .modal-bg{
+    position:fixed;inset:0;z-index:50;background:rgba(60,40,20,.45);
+    display:flex;align-items:flex-end;justify-content:center;padding:0;
+  }
+  .modal{
+    background:var(--panel);width:100%;max-width:520px;border-radius:20px 20px 0 0;
+    padding:22px 20px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;
+    box-shadow:0 -8px 40px rgba(60,40,20,.25)
+  }
+  @media(min-width:560px){.modal-bg{align-items:center}.modal{border-radius:20px}}
+  .modal h3{margin:0 0 4px;font-size:20px}
+  .modal .price{color:var(--amber);font-weight:800}
+  .feat{list-style:none;padding:0;margin:12px 0}
+  .feat li{padding:6px 0;font-size:14px;display:flex;gap:9px;align-items:flex-start}
+  .feat li::before{content:"✓";color:var(--green);font-weight:800}
+  .wallet{display:flex;gap:8px;margin:6px 0 2px}
+  .wallet input{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .muted{color:var(--muted);font-size:13px}
+  .err{color:var(--red);font-size:13px;font-weight:600;min-height:18px}
+  .ok{color:var(--green);font-size:13px;font-weight:700;min-height:18px}
+  details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  details summary{cursor:pointer;font-weight:700;color:var(--amber)}
+  hr.soft{border:none;border-top:1px solid var(--line);margin:16px 0}
+  .footnote{text-align:center;color:var(--muted);font-size:12px;margin:24px 0 8px}
+  .footnote a{color:var(--amber)}
+  .locknote{font-size:12px;color:var(--muted);margin-top:8px}
+  .coop-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .coop-bar select{flex:1;min-width:140px}
+</style>
+</head>
+<body>
+<header class="app">
+  <span class="logo">🐔</span>
+  <div>
+    <h1>ChickenLog</h1>
+    <div class="sub">Egg &amp; flock log · private &amp; offline</div>
+  </div>
+  <span class="spacer"></span>
+  <button class="pro-pill" id="proPill" onclick="openLicense()">Go Pro</button>
+</header>
+
+<main>
+  <!-- HOME -->
+  <div class="view on" id="v-home">
+    <section>
+      <h2>This week</h2>
+      <div class="cards">
+        <div class="card accent"><div class="big" id="c-week">0</div><div class="lbl">eggs (last 7 days)</div></div>
+        <div class="card"><div class="big" id="c-birds">0</div><div class="lbl">active birds</div></div>
+        <div class="card"><div class="big" id="c-perbird">–</div><div class="lbl">eggs / bird / wk</div></div>
+      </div>
+    </section>
+    <section>
+      <h2>Totals</h2>
+      <div class="cards">
+        <div class="card"><div class="big" id="c-today">0</div><div class="lbl">eggs today</div></div>
+        <div class="card"><div class="big" id="c-month">0</div><div class="lbl">last 30 days</div></div>
+        <div class="card"><div class="big" id="c-all">0</div><div class="lbl">all-time eggs</div></div>
+      </div>
+    </section>
+    <section>
+      <h2>Laying trend (last 14 days)</h2>
+      <div class="panel">
+        <div class="bars" id="trend"></div>
+      </div>
+    </section>
+    <section>
+      <h2>Last health treatment</h2>
+      <div class="panel" id="lastHealth"></div>
+    </section>
+  </div>
+
+  <!-- EGGS -->
+  <div class="view" id="v-eggs">
+    <section>
+      <h2>Log eggs</h2>
+      <div class="panel" id="eggCoopBar"></div>
+      <div class="panel mt">
+        <div class="row">
+          <div style="flex:2">
+            <label for="eggDate">Date</label>
+            <input type="date" id="eggDate">
+          </div>
+          <div>
+            <label for="eggCount">Eggs collected</label>
+            <input type="number" id="eggCount" min="0" max="500" inputmode="numeric" placeholder="0">
+          </div>
+        </div>
+        <div class="quick">
+          <button onclick="bump(1)">+1</button>
+          <button onclick="bump(2)">+2</button>
+          <button onclick="bump(3)">+3</button>
+          <button onclick="bump(6)">+6</button>
+          <button onclick="bump(12)">+12</button>
+        </div>
+        <button class="btn mt" style="width:100%" onclick="saveEgg()">Save egg count for this date</button>
+        <div class="muted mt" id="eggHint"></div>
+      </div>
+    </section>
+    <section>
+      <h2>Egg history</h2>
+      <div class="panel">
+        <ul class="list" id="eggList"></ul>
+      </div>
+      <button class="btn sec pro mt" style="width:100%" onclick="exportEggsCSV()">Export egg log to CSV</button>
+    </section>
+  </div>
+
+  <!-- FLOCK -->
+  <div class="view" id="v-flock">
+    <section>
+      <h2>Add a bird</h2>
+      <div class="panel" id="flockCoopBar"></div>
+      <div class="panel mt">
+        <div class="row">
+          <div><label for="bName">Name</label><input id="bName" placeholder="Henrietta" maxlength="40"></div>
+          <div><label for="bBreed">Breed</label><input id="bBreed" placeholder="Rhode Island Red" maxlength="40"></div>
+        </div>
+        <div class="row mt">
+          <div><label for="bDob">Hatch / DOB <span class="muted">(opt)</span></label><input type="date" id="bDob"></div>
+          <div><label for="bAcq">Acquired <span class="muted">(opt)</span></label><input type="date" id="bAcq"></div>
+        </div>
+        <button class="btn mt" style="width:100%" onclick="addBird()">Add bird</button>
+      </div>
+    </section>
+    <section>
+      <h2>My flock</h2>
+      <div class="panel"><ul class="list" id="flockList"></ul></div>
+    </section>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="view" id="v-health">
+    <section>
+      <h2>Record treatment / health</h2>
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="hType">Type</label>
+            <select id="hType">
+              <option>Mites/Lice</option>
+              <option>Wormer</option>
+              <option>Illness</option>
+              <option>Vaccine</option>
+              <option>Vet</option>
+              <option>Note</option>
+            </select>
+          </div>
+          <div>
+            <label for="hDate">Date</label>
+            <input type="date" id="hDate">
+          </div>
+        </div>
+        <div class="mt">
+          <label for="hBird">Applies to</label>
+          <select id="hBird"></select>
+        </div>
+        <div class="mt">
+          <label for="hNote">Product / details</label>
+          <input id="hNote" placeholder="e.g. Elector PSP, 0.5ml/L drinking water" maxlength="200">
+        </div>
+        <button class="btn mt" style="width:100%" onclick="addHealth()">Save record</button>
+      </div>
+    </section>
+    <section>
+      <h2>Health &amp; treatment log</h2>
+      <div class="panel"><ul class="list" id="healthList"></ul></div>
+      <button class="btn sec pro mt" style="width:100%" onclick="exportHealthCSV()">Export health log to CSV</button>
+    </section>
+  </div>
+
+  <!-- NOTES -->
+  <div class="view" id="v-notes">
+    <section>
+      <h2>Coop &amp; flock notes</h2>
+      <div class="panel">
+        <div class="muted" style="margin-bottom:8px">Predator events, coop maintenance, feed changes, anything worth remembering.</div>
+        <div class="row">
+          <div style="flex:0 0 160px"><label for="nDate">Date</label><input type="date" id="nDate"></div>
+          <div><label for="nText">Note</label><input id="nText" placeholder="Switched to layer pellets + oyster shell" maxlength="280"></div>
+        </div>
+        <button class="btn mt" style="width:100%" onclick="addNote()">Add note</button>
+      </div>
+    </section>
+    <section>
+      <h2>Notes log</h2>
+      <div class="panel"><ul class="list" id="noteList"></ul></div>
+    </section>
+  </div>
+
+  <!-- CHARTS (PRO) -->
+  <div class="view" id="v-charts">
+    <section>
+      <h2>Monthly egg production</h2>
+      <div class="panel" id="chartWrap"></div>
+    </section>
+    <section>
+      <h2>Data &amp; backup</h2>
+      <div class="panel">
+        <p class="muted" style="margin-top:0">Everything lives in this browser only. Back it up or move devices here.</p>
+        <div class="row">
+          <button class="btn sec" onclick="exportBackup()">Download backup (.json)</button>
+          <button class="btn ghost" onclick="document.getElementById('impFile').click()">Restore backup</button>
+        </div>
+        <input type="file" id="impFile" accept="application/json" style="display:none" onchange="importBackup(this)">
+      </div>
+    </section>
+  </div>
+
+  <p class="footnote">
+    ChickenLog · 100% on your device, no account, works offline.<br>
+    Questions or feedback? <a id="issuesLink" target="_blank" rel="noopener">Open an issue</a>.
+  </p>
+</main>
+
+<nav class="tabs">
+  <button data-v="home" class="on" onclick="go('home')"><span class="ic">🏠</span>Home</button>
+  <button data-v="eggs" onclick="go('eggs')"><span class="ic">🥚</span>Eggs</button>
+  <button data-v="flock" onclick="go('flock')"><span class="ic">🐔</span>Flock</button>
+  <button data-v="health" onclick="go('health')"><span class="ic">💊</span>Health</button>
+  <button data-v="notes" onclick="go('notes')"><span class="ic">📝</span>Notes</button>
+  <button data-v="charts" onclick="go('charts')"><span class="ic">📈</span>Charts</button>
+</nav>
+
+<script>
+/* ============ LICENSING (verbatim contract) ============ */
+const PUBLIC_JWK={"kty":"EC","x":"P-8D55TM33_fvVoGQpl3bCydyllH9oK7QtlzGcFeQN0","y":"ks3Wck2AzsAql46XGp4_A4IS8X3-rRUTqD-sZyLE-o4","crv":"P-256"};
+const PAY = { wallet:"0xe339997037C7e1C81829fA3e110d3e82B4bDd48E", chain:"Base", token:"USDC", price:"9", contact:"https://github.com/AlexeySamosadov/chickenlog/issues/new" };
+let pro=false;
+function fromB(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const b=atob(s);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function verifyLicense(str){try{const[p,sg]=str.trim().split(".");if(!p||!sg)return null;const k=await crypto.subtle.importKey("jwk",PUBLIC_JWK,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);if(!await crypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},k,fromB(sg),fromB(p)))return null;const pl=JSON.parse(new TextDecoder().decode(fromB(p)));if(pl.exp&&Math.floor(Date.now()/1000)>pl.exp)return{expired:true};return pl;}catch(e){return null;}}
+async function applyLicense(str,silent){const pl=await verifyLicense(str);if(pl&&!pl.expired&&pl.plan==="pro"){pro=true;localStorage.setItem("chickenlog_license",str);if(typeof render==="function")render();if(!silent){const o=document.querySelector("#licOk");if(o)o.textContent="Unlocked — thank you";setTimeout(()=>{const b=document.querySelector("#licBg");if(b)b.remove();},800);}return true;}if(!silent){const e=document.querySelector("#licErr");if(e)e.textContent=pl&&pl.expired?"License expired.":"Invalid key.";}return false;}
+
+function openLicense(){
+  if(document.querySelector("#licBg"))return;
+  const bg=document.createElement("div");
+  bg.className="modal-bg";bg.id="licBg";
+  bg.onclick=(e)=>{if(e.target===bg)bg.remove();};
+  bg.innerHTML=`
+    <div class="modal" role="dialog" aria-label="ChickenLog Pro">
+      <h3>ChickenLog Pro — <span class="price">9 USDC</span></h3>
+      <div class="muted">One-time payment · lifetime · unlocks on this device. Free features stay free forever.</div>
+      <ul class="feat">
+        <li>Export egg log &amp; health records to CSV (vet visits, spreadsheets, sale records)</li>
+        <li>Monthly egg-production charts to spot your flock's laying seasons</li>
+        <li>Multi-coop — track separate flocks / runs independently</li>
+        <li>Backup &amp; restore all your data</li>
+      </ul>
+      <hr class="soft">
+      <p style="margin:0 0 6px;font-weight:700">1 · Pay 9 USDC on Base to:</p>
+      <div class="wallet">
+        <input id="payWallet" readonly value="${PAY.wallet}">
+        <button class="btn sec sm" id="copyWallet">Copy</button>
+      </div>
+      <p class="muted" style="margin:4px 0 0">Send <b>USDC</b> on the <b>Base</b> network only. Keep the transaction hash.</p>
+      <hr class="soft">
+      <p style="margin:0 0 6px;font-weight:700">2 · Get your key (auto-issued in ~1 min):</p>
+      <div class="row">
+        <div><label for="txh">Payment tx hash</label><input id="txh" placeholder="0x…" autocomplete="off"></div>
+      </div>
+      <div class="row mt">
+        <div><label for="email">Email <span class="muted">(optional)</span></label><input id="email" placeholder="you@example.com" autocomplete="off"></div>
+      </div>
+      <button class="btn mt" style="width:100%" id="getKey">Get my key →</button>
+      <div class="err mt" id="licErr"></div>
+      <div class="ok" id="licOk"></div>
+      <details>
+        <summary>Have a key? Activate it</summary>
+        <div class="mt">
+          <textarea id="licKey" placeholder="Paste your license key (xxxx.yyyy)"></textarea>
+          <button class="btn sec mt" style="width:100%" id="activate">Activate license</button>
+        </div>
+        <p class="locknote">Your key is signed and verified offline — no server, no tracking.</p>
+      </details>
+    </div>`;
+  document.body.appendChild(bg);
+  bg.querySelector("#copyWallet").onclick=()=>{
+    const inp=bg.querySelector("#payWallet");inp.select();
+    navigator.clipboard?.writeText(PAY.wallet).catch(()=>{});
+    try{document.execCommand("copy");}catch(e){}
+    bg.querySelector("#copyWallet").textContent="Copied";
+    setTimeout(()=>{const c=bg.querySelector("#copyWallet");if(c)c.textContent="Copy";},1200);
+  };
+  bg.querySelector("#getKey").onclick=()=>{
+    const tx=(bg.querySelector("#txh").value||"").trim();
+    const em=(bg.querySelector("#email").value||"").trim();
+    if(!tx){bg.querySelector("#licErr").textContent="Paste your payment tx hash first.";return;}
+    bg.querySelector("#licErr").textContent="";
+    window.open(PAY.contact+"?title=ChickenLog%20Pro%20license%20request&body="+encodeURIComponent("Payment tx hash: "+tx+"\nEmail: "+em),"_blank","noopener");
+    bg.querySelector("#licOk").textContent="Request opened on GitHub — your key will be posted there shortly.";
+  };
+  bg.querySelector("#activate").onclick=()=>{
+    const k=(bg.querySelector("#licKey").value||"").trim();
+    if(!k){bg.querySelector("#licErr").textContent="Paste a key first.";return;}
+    applyLicense(k,false);
+  };
+}
+
+/* ============ DATA LAYER ============ */
+const LS="chickenlog_data_v1";
+let DB={coops:[{id:"c1",name:"Main coop"}],activeCoop:"c1",eggs:{},birds:[],health:[],notes:[]};
+function load(){
+  try{const r=localStorage.getItem(LS);if(r){DB=Object.assign(DB,JSON.parse(r));}}catch(e){}
+  if(!DB.coops||!DB.coops.length)DB.coops=[{id:"c1",name:"Main coop"}];
+  if(!DB.activeCoop)DB.activeCoop=DB.coops[0].id;
+  if(!DB.eggs)DB.eggs={};if(!DB.birds)DB.birds=[];if(!DB.health)DB.health=[];if(!DB.notes)DB.notes=[];
+  // migrate legacy flat structures lacking coop tags
+  DB.birds.forEach(b=>{if(!b.coop)b.coop=DB.coops[0].id;});
+  DB.health.forEach(h=>{if(!h.coop)h.coop=DB.coops[0].id;});
+  DB.notes.forEach(n=>{if(!n.coop)n.coop=DB.coops[0].id;});
+}
+function save(){try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const today=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+function ek(coop,date){return coop+"|"+date;}
+function activeCoop(){return DB.activeCoop;}
+function fmtDate(s){if(!s)return"";const d=new Date(s+"T00:00:00");return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});}
+function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+
+/* ============ EGG OPS ============ */
+function eggsFor(date){const v=DB.eggs[ek(activeCoop(),date)];return v?v:0;}
+function setEggs(date,n){const key=ek(activeCoop(),date);if(n>0)DB.eggs[key]=n;else delete DB.eggs[key];save();}
+function eggsInRange(fromDate){let sum=0;const pfx=activeCoop()+"|";for(const k in DB.eggs){if(!k.startsWith(pfx))continue;const d=k.slice(pfx.length);if(d>=fromDate)sum+=DB.eggs[k];}return sum;}
+function eggsAllTime(){let sum=0;const pfx=activeCoop()+"|";for(const k in DB.eggs){if(k.startsWith(pfx))sum+=DB.eggs[k];}return sum;}
+function bump(n){const el=document.getElementById("eggCount");el.value=(parseInt(el.value||"0",10)+n);}
+function saveEgg(){
+  const date=document.getElementById("eggDate").value||today();
+  const n=Math.max(0,parseInt(document.getElementById("eggCount").value||"0",10));
+  setEggs(date,n);
+  document.getElementById("eggHint").textContent="Saved "+n+" egg"+(n===1?"":"s")+" for "+fmtDate(date)+".";
+  render();
+}
+function deleteEgg(date){if(confirm("Remove egg entry for "+fmtDate(date)+"?")){setEggs(date,0);render();}}
+
+/* ============ FLOCK OPS ============ */
+function addBird(){
+  const name=(document.getElementById("bName").value||"").trim();
+  if(!name){alert("Give your bird a name.");return;}
+  DB.birds.push({id:uid(),coop:activeCoop(),name,breed:(document.getElementById("bBreed").value||"").trim(),dob:document.getElementById("bDob").value||"",acq:document.getElementById("bAcq").value||"",status:"active"});
+  save();
+  document.getElementById("bName").value="";document.getElementById("bBreed").value="";document.getElementById("bDob").value="";document.getElementById("bAcq").value="";
+  render();
+}
+function birdsActive(){return DB.birds.filter(b=>b.coop===activeCoop()&&b.status==="active");}
+function birdsAll(){return DB.birds.filter(b=>b.coop===activeCoop());}
+function toggleBird(id){const b=DB.birds.find(x=>x.id===id);if(!b)return;b.status=b.status==="active"?"lost":"active";save();render();}
+function delBird(id){const b=DB.birds.find(x=>x.id===id);if(b&&confirm("Delete "+b.name+"? Health records for this bird are kept."))  {DB.birds=DB.birds.filter(x=>x.id!==id);save();render();}}
+
+/* ============ HEALTH OPS ============ */
+function addHealth(){
+  const rec={id:uid(),coop:activeCoop(),type:document.getElementById("hType").value,date:document.getElementById("hDate").value||today(),bird:document.getElementById("hBird").value,note:(document.getElementById("hNote").value||"").trim()};
+  DB.health.push(rec);save();
+  document.getElementById("hNote").value="";
+  render();go("health");
+}
+function delHealth(id){if(confirm("Delete this health record?")){DB.health=DB.health.filter(x=>x.id!==id);save();render();}}
+function healthFor(){return DB.health.filter(h=>h.coop===activeCoop()).slice().sort((a,b)=>b.date<a.date?-1:b.date>a.date?1:0);}
+function birdName(id){if(id==="__flock__"||!id)return"Whole flock";const b=DB.birds.find(x=>x.id===id);return b?b.name:"(removed bird)";}
+
+/* ============ NOTES OPS ============ */
+function addNote(){
+  const t=(document.getElementById("nText").value||"").trim();
+  if(!t){alert("Write a note first.");return;}
+  DB.notes.push({id:uid(),coop:activeCoop(),date:document.getElementById("nDate").value||today(),text:t});save();
+  document.getElementById("nText").value="";render();
+}
+function delNote(id){if(confirm("Delete this note?")){DB.notes=DB.notes.filter(x=>x.id!==id);save();render();}}
+function notesFor(){return DB.notes.filter(n=>n.coop===activeCoop()).slice().sort((a,b)=>b.date<a.date?-1:b.date>a.date?1:0);}
+
+/* ============ COOPS (PRO multi-coop) ============ */
+function setCoop(id){DB.activeCoop=id;save();render();}
+function addCoop(){
+  if(!pro)return openLicense();
+  const name=prompt("Name this coop / flock (e.g. Bantams, Back run):");
+  if(!name||!name.trim())return;
+  const c={id:uid(),name:name.trim()};DB.coops.push(c);DB.activeCoop=c.id;save();render();
+}
+function renderCoopBar(elId){
+  const el=document.getElementById(elId);if(!el)return;
+  if(DB.coops.length<=1&&!pro){
+    el.innerHTML=`<div class="muted" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span>Coop: <b>${DB.coops[0].name}</b></span>
+      <button class="btn sec sm pro" onclick="addCoop()">Add coop</button></div>`;
+    return;
+  }
+  const opts=DB.coops.map(c=>`<option value="${c.id}"${c.id===DB.activeCoop?" selected":""}>${esc(c.name)}</option>`).join("");
+  el.innerHTML=`<div class="coop-bar">
+    <span style="font-weight:700">Coop</span>
+    <select onchange="setCoop(this.value)">${opts}</select>
+    <button class="btn sec sm pro" onclick="addCoop()">+ Coop</button>
+  </div>`;
+}
+
+/* ============ EXPORTS (PRO) ============ */
+function dl(name,text,mime){
+  const blob=new Blob([text],{type:mime||"text/plain"});const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function csvCell(v){v=(v==null?"":String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function exportEggsCSV(){
+  if(!pro)return openLicense();
+  const pfx=activeCoop()+"|";const rows=[["date","eggs","coop"]];
+  const coopName=DB.coops.find(c=>c.id===activeCoop())?.name||"";
+  Object.keys(DB.eggs).filter(k=>k.startsWith(pfx)).map(k=>k.slice(pfx.length)).sort().forEach(d=>rows.push([d,DB.eggs[pfx+d],coopName]));
+  dl("chickenlog-eggs.csv",rows.map(r=>r.map(csvCell).join(",")).join("\n"),"text/csv");
+}
+function exportHealthCSV(){
+  if(!pro)return openLicense();
+  const rows=[["date","type","applies_to","details","coop"]];
+  const coopName=DB.coops.find(c=>c.id===activeCoop())?.name||"";
+  healthFor().slice().reverse().forEach(h=>rows.push([h.date,h.type,birdName(h.bird),h.note,coopName]));
+  dl("chickenlog-health.csv",rows.map(r=>r.map(csvCell).join(",")).join("\n"),"text/csv");
+}
+function exportBackup(){
+  if(!pro)return openLicense();
+  dl("chickenlog-backup.json",JSON.stringify(DB,null,2),"application/json");
+}
+function importBackup(input){
+  const f=input.files&&input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=="object")throw 0;DB=d;load();save();render();alert("Backup restored.");}catch(e){alert("That file isn't a valid ChickenLog backup.");}};
+  r.readAsText(f);input.value="";
+}
+
+/* ============ RENDER ============ */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function render(){
+  // pro pill
+  const pill=document.getElementById("proPill");
+  if(pro){pill.textContent="✓ Pro";pill.classList.add("on");pill.onclick=null;pill.style.cursor="default";}
+  else{pill.textContent="Go Pro";pill.classList.remove("on");pill.onclick=openLicense;pill.style.cursor="pointer";}
+
+  // home cards
+  const week=eggsInRange(daysAgo(6));
+  const month=eggsInRange(daysAgo(29));
+  document.getElementById("c-week").textContent=week;
+  document.getElementById("c-today").textContent=eggsFor(today());
+  document.getElementById("c-month").textContent=month;
+  document.getElementById("c-all").textContent=eggsAllTime();
+  const nb=birdsActive().length;
+  document.getElementById("c-birds").textContent=nb;
+  document.getElementById("c-perbird").textContent=nb?(week/nb).toFixed(1):"–";
+
+  // trend (14 days)
+  const trend=document.getElementById("trend");
+  let bars="";let max=1;const vals=[];
+  for(let i=13;i>=0;i--){const d=daysAgo(i);const v=eggsFor(d);vals.push({d,v});if(v>max)max=v;}
+  vals.forEach(({d,v})=>{
+    const h=Math.round((v/max)*100);
+    const dd=new Date(d+"T00:00:00").getDate();
+    bars+=`<div class="b ${v===max&&v>0?"hi":""}" style="height:${Math.max(h,v>0?8:2)}%" title="${fmtDate(d)}: ${v}"><span>${v||""}</span><em>${dd}</em></div>`;
+  });
+  trend.innerHTML=bars;
+
+  // last health
+  const lh=document.getElementById("lastHealth");
+  const recent=healthFor()[0];
+  if(recent){
+    lh.innerHTML=`<div class="li-title">${esc(recent.type)} · <span class="muted">${fmtDate(recent.date)}</span></div>
+      <div class="li-sub">${esc(birdName(recent.bird))}${recent.note?" — "+esc(recent.note):""}</div>`;
+  }else{
+    lh.innerHTML=`<div class="empty">No treatments logged yet. Track mite/lice treatments, worming and vet visits on the Health tab.</div>`;
+  }
+
+  // egg coop bar + history
+  renderCoopBar("eggCoopBar");
+  const eggList=document.getElementById("eggList");
+  const pfx=activeCoop()+"|";
+  const dates=Object.keys(DB.eggs).filter(k=>k.startsWith(pfx)).map(k=>k.slice(pfx.length)).sort().reverse().slice(0,60);
+  if(!dates.length){eggList.innerHTML=`<li class="empty">No eggs logged for this coop yet — add today's count above.</li>`;}
+  else{
+    eggList.innerHTML=dates.map(d=>`<li>
+      <div class="li-main"><div class="li-title">${DB.eggs[pfx+d]} 🥚</div><div class="li-sub">${fmtDate(d)}${d===today()?" · today":""}</div></div>
+      <button class="x" title="Remove" onclick="deleteEgg('${d}')">✕</button></li>`).join("");
+  }
+
+  // flock
+  renderCoopBar("flockCoopBar");
+  const fl=document.getElementById("flockList");
+  const birds=birdsAll();
+  if(!birds.length){fl.innerHTML=`<li class="empty">No birds yet. Add your hens and roosters above.</li>`;}
+  else{
+    fl.innerHTML=birds.map(b=>{
+      let sub=[];if(b.breed)sub.push(esc(b.breed));if(b.dob)sub.push("hatched "+fmtDate(b.dob));else if(b.acq)sub.push("got "+fmtDate(b.acq));
+      return `<li>
+        <div class="li-main"><div class="li-title">${esc(b.name)}</div><div class="li-sub">${sub.join(" · ")||"&nbsp;"}</div></div>
+        <span class="tag ${b.status}" onclick="toggleBird('${b.id}')" style="cursor:pointer" title="Tap to toggle">${b.status==="active"?"active":"lost"}</span>
+        <button class="x" onclick="delBird('${b.id}')" title="Delete">✕</button></li>`;
+    }).join("");
+  }
+
+  // health select + list
+  const sel=document.getElementById("hBird");
+  if(sel){
+    const prev=sel.value;
+    sel.innerHTML=`<option value="__flock__">Whole flock</option>`+birdsActive().map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join("");
+    if(prev)sel.value=prev;
+  }
+  const hl=document.getElementById("healthList");
+  const hrecs=healthFor();
+  if(!hrecs.length){hl.innerHTML=`<li class="empty">No health records yet. Log mite/lice & worming treatments, vaccines and vet visits.</li>`;}
+  else{
+    hl.innerHTML=hrecs.map(h=>`<li>
+      <div class="li-main"><div class="li-title"><span class="tag t">${esc(h.type)}</span> ${esc(birdName(h.bird))}</div>
+      <div class="li-sub">${fmtDate(h.date)}${h.note?" · "+esc(h.note):""}</div></div>
+      <button class="x" onclick="delHealth('${h.id}')" title="Delete">✕</button></li>`).join("");
+  }
+
+  // notes
+  const nl=document.getElementById("noteList");
+  const nrecs=notesFor();
+  if(!nrecs.length){nl.innerHTML=`<li class="empty">No notes yet. Jot down feed changes, predator sightings, coop repairs.</li>`;}
+  else{
+    nl.innerHTML=nrecs.map(n=>`<li>
+      <div class="li-main"><div class="li-title">${esc(n.text)}</div><div class="li-sub">${fmtDate(n.date)}</div></div>
+      <button class="x" onclick="delNote('${n.id}')" title="Delete">✕</button></li>`).join("");
+  }
+
+  // charts (pro)
+  renderCharts();
+}
+
+function renderCharts(){
+  const wrap=document.getElementById("chartWrap");if(!wrap)return;
+  if(!pro){
+    wrap.innerHTML=`<div class="empty" style="padding:28px 10px">
+      📈 Monthly egg-production charts are a <b>Pro</b> feature.<br><br>
+      <button class="btn" onclick="openLicense()">Unlock ChickenLog Pro — 9 USDC</button>
+      <p class="locknote">See your flock's seasonal laying patterns at a glance.</p></div>`;
+    return;
+  }
+  // build monthly totals across ALL coops? -> active coop, last 12 months
+  const pfx=activeCoop()+"|";
+  const now=new Date();const months=[];
+  for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.toISOString().slice(0,7),label:d.toLocaleDateString(undefined,{month:"short"}),year:d.getFullYear(),total:0});}
+  const idx={};months.forEach(m=>idx[m.key]=m);
+  for(const k in DB.eggs){if(!k.startsWith(pfx))continue;const ym=k.slice(pfx.length,pfx.length+7);if(idx[ym])idx[ym].total+=DB.eggs[k];}
+  const max=Math.max(1,...months.map(m=>m.total));
+  const W=680,H=240,padL=34,padB=42,padT=14,padR=10;
+  const cw=W-padL-padR,ch=H-padT-padB,bw=cw/months.length;
+  let bars="",labels="",grid="";
+  for(let g=0;g<=4;g++){const y=padT+ch-(ch*g/4);const val=Math.round(max*g/4);
+    grid+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#f0e0d0"/><text x="${padL-6}" y="${y+4}" font-size="10" fill="#92837a" text-anchor="end">${val}</text>`;}
+  months.forEach((m,i)=>{
+    const bh=Math.round((m.total/max)*ch);const x=padL+i*bw+bw*0.16;const w=bw*0.68;const y=padT+ch-bh;
+    bars+=`<rect x="${x}" y="${y}" width="${w}" height="${Math.max(bh,m.total>0?2:0)}" rx="3" fill="${m.total===max&&max>0?"#b45309":"#fbbf24"}"><title>${m.label} ${m.year}: ${m.total} eggs</title></rect>`;
+    if(m.total>0)bars+=`<text x="${x+w/2}" y="${y-4}" font-size="10" fill="#43302b" text-anchor="middle" font-weight="700">${m.total}</text>`;
+    labels+=`<text x="${padL+i*bw+bw/2}" y="${H-padB+16}" font-size="10" fill="#92837a" text-anchor="middle">${m.label}</text>`;
+    if(i===0||m.key.endsWith("-01"))labels+=`<text x="${padL+i*bw+bw/2}" y="${H-padB+28}" font-size="9" fill="#c0b0a0" text-anchor="middle">${m.year}</text>`;
+  });
+  const total=months.reduce((s,m)=>s+m.total,0);
+  wrap.innerHTML=`<div class="muted" style="margin-bottom:6px">Eggs per month · last 12 months · <b>${total}</b> total in <b>${esc(DB.coops.find(c=>c.id===activeCoop())?.name||"")}</b></div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Monthly egg production">${grid}${bars}${labels}</svg>`;
+}
+
+/* ============ NAV ============ */
+function go(v){
+  document.querySelectorAll(".view").forEach(el=>el.classList.toggle("on",el.id==="v-"+v));
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  window.scrollTo(0,0);
+}
+
+/* ============ INIT ============ */
+load();
+document.getElementById("eggDate").value=today();
+document.getElementById("hDate").value=today();
+document.getElementById("nDate").value=today();
+document.getElementById("eggCount").value=eggsFor(today())||"";
+document.getElementById("issuesLink").href=PAY.contact;
+render();
+(async()=>{const saved=localStorage.getItem("chickenlog_license");if(saved)await applyLicense(saved,true);})();
+</script>
+</body>
+</html>
