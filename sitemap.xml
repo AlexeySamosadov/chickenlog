@@ -15,4 +15,29 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://alexeysamosadov.github.io/chickenlog/how-many-eggs-do-chickens-lay.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alexeysamosadov.github.io/chickenlog/why-are-my-chickens-not-laying.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alexeysamosadov.github.io/chickenlog/chicken-deworming-schedule.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alexeysamosadov.github.io/chickenlog/backyard-chicken-record-keeping.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alexeysamosadov.github.io/chickenlog/chicken-laying-less-eggs-in-winter.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
